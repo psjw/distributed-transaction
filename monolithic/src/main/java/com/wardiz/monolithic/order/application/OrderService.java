@@ -8,6 +8,7 @@ import com.wardiz.monolithic.order.infrastructure.OrderRepository;
 import com.wardiz.monolithic.point.application.PointService;
 import com.wardiz.monolithic.product.application.ProductService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderService {
@@ -26,6 +27,7 @@ public class OrderService {
     }
 
 
+    @Transactional
     public void placeOrder(PlaceOrderCommand command) {
         Order order = orderRepository.save(new Order());
         Long totalPrice = 0L;
