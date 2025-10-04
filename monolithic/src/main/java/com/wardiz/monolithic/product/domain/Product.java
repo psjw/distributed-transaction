@@ -21,8 +21,7 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, Long quantity, Long price) {
-        this.id = id;
+    public Product(Long quantity, Long price) {
         this.quantity = quantity;
         this.price = price;
     }

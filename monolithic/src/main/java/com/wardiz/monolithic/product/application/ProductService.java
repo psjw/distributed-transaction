@@ -21,7 +21,7 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("데이터가 존재하지 않습니다."));
 
         Long totalPrice = product.calculatePrice(quantity);
-        product.buy(totalPrice);
+        product.buy(quantity);
 
         productRepository.save(product);
 
