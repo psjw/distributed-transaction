@@ -18,9 +18,9 @@ public class PointService {
         Point point = pointRepository.findByUserId(userId);
 
         //강제 Exception -> 포인트 차감이 안됨
-        if(true){
-            throw new RuntimeException("foo");
-        }
+//        if(true){
+//            throw new RuntimeException("foo");
+//        }
 
         if(point == null){
             throw  new RuntimeException("포인트가 존재하지 않습니다.");

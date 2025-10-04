@@ -1,0 +1,27 @@
+POST http://localhost:8080/order
+Content-Type: application/json
+
+{
+  "orderItems" : [
+    {"productId": 1, "quantity": 1},
+    {"productId": 2, "quantity": 2}
+  ]
+}
+
+###
+
+POST http://localhost:8080/order/place
+Content-Type: application/json
+
+{
+  "orderId": 1
+}
+
+###
+
+POST http://localhost:8080/order/place
+Content-Type: application/json
+
+{
+  "orderId": 1
+}
