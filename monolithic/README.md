@@ -45,3 +45,60 @@
 1. 2PC
 2. TCC
 3. SAGA
+
+## 2PC란?
+
+- Two-Phase Commit Protocol의 약자로 분산시스템에서 트랜잭션의 원자성을 보장하기 위해 사용하는 프로토콜
+- 트랜잭션을 두단계로 나누어 처리함
+  - Prepare 단계 : 트랜잭션 매니저가 참여자에게 작업 준비가 가능한지 묻는다
+  - Commit 단계 : Prepare단계에서 모든 참여자가 작업이 가능하다고 응답하면 실제로 커밋을 수행한다.
+- 대표적인 구현으로는 XA 트랜잭션이 존재합니다.
+
+- 1번
+```sql
+create database 2pc1;
+       
+create table product (
+    id INT PRIMARY KEY,
+    quantity INT);
+
+insert into product values(1,1000);
+
+xa start 'product_1';
+update product set quantity=900 where id =1;
+xa end 'product_1';
+   
+xa prepare 'product_1';
+xa commit 'product_1'; 
+```
+- 2번
+```sql
+create database 2pc2;
+       
+create table point (
+    id INT PRIMARY KEY,
+    amount INT);
+
+
+xa start 'point_1';
+insert into point values(1,1000);
+xa end 'point_1'
+```
+
+- 3번
+```sql
+update product set quantity=900 where id =1; --락 걸림 xa commit 'product_1'; 이후 수행됨
+```
+
+# 2PC 장단점
+
+- 장점 
+  - 강력한 정합성을 보장
+  - 사용하는 데이터베이스가 XA를 지원한다면 구현난이도가 낮음
+- 단점
+  - 사용하는 데이터베이스가  XA를 지원하지 않는다면 구현하기 어렵습니다.
+  - prepare 단계 이후 commit이 완료될떄까지 lock을 유지하기 때문에 가용성이 낮아집니다.
+  - 장애복구시 수동으로 개입하여 해결해야 합니다.
+  - 실용성이 낮습니다.
+- 실무에서는?
+  - 2PC보다 다른 방법을 사용하여 분산트랜잭션을 구현합니다.
