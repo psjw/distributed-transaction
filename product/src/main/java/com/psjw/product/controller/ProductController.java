@@ -1,5 +1,6 @@
 package com.psjw.product.controller;
 
+import com.psjw.product.appliaction.ProductFacadeService;
 import com.psjw.product.appliaction.ProductService;
 import com.psjw.product.appliaction.RedisLockService;
 import com.psjw.product.appliaction.dto.ProductReserveResult;
@@ -12,15 +13,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductFacadeService productFacadeService;
 
     private final RedisLockService redisLockService;
 
-
-    public ProductController(ProductService productService, RedisLockService redisLockService) {
-        this.productService = productService;
+    public ProductController(ProductFacadeService productFacadeService,
+            RedisLockService redisLockService) {
+        this.productFacadeService = productFacadeService;
         this.redisLockService = redisLockService;
     }
+
 
     @PostMapping("/product/reserve")
     public ProductReserveResponse reserve(@RequestBody ProductReserveRequest request) {
@@ -32,7 +34,7 @@ public class ProductController {
         }
 
         try{
-            ProductReserveResult result = productService.tryReserve(request.toCommand());
+            ProductReserveResult result = productFacadeService.tryReserve(request.toCommand());
             return new ProductReserveResponse(result.totalPrice());
         }finally {
             redisLockService.releaseLock(key);
