@@ -23,8 +23,17 @@ public class PointController {
         this.redisLockService = redisLockService;
     }
 
+    int count = 0;
+
     @PostMapping("/point/reserve")
-    public void reserve(@RequestBody PointReserveRequest request){
+    public void reserve(@RequestBody PointReserveRequest request) throws InterruptedException {
+        System.out.println("진입!!!");
+        if(count % 2 ==0 ){
+            count++;
+//            throw new RuntimeException("테스트를 위한 오류!"); //일반적인 오류
+            Thread.sleep(2000);
+        }
+
         String key = "point:" + request.requestId();
         boolean acquiredLock = redisLockService.tryLock(key, request.requestId());
 

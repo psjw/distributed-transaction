@@ -3,7 +3,9 @@ package com.psjw.order.infrastructure.point;
 import com.psjw.order.infrastructure.point.dto.PointReserveApiRequest;
 import com.psjw.order.infrastructure.point.dto.PointReserveCancelApiRequest;
 import com.psjw.order.infrastructure.point.dto.PointReserveConfirmApiRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 
@@ -14,6 +16,15 @@ public class PointApiClient {
         this.restClient = restClient;
     }
 
+    @Retryable(
+            retryFor = {Exception.class},
+            noRetryFor = {
+                    HttpClientErrorException.BadRequest.class,
+                    HttpClientErrorException.NotFound.class
+            },
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 500)
+    )
     public void reservePoint(PointReserveApiRequest request){
         restClient.post()
                 .uri("/point/reserve")

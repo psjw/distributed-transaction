@@ -4,7 +4,8 @@ import com.psjw.order.infrastructure.product.dto.ProductReserveApiRequest;
 import com.psjw.order.infrastructure.product.dto.ProductReserveApiResponse;
 import com.psjw.order.infrastructure.product.dto.ProductReserveCancelApiRequest;
 import com.psjw.order.infrastructure.product.dto.ProductReserveConfirmApiRequest;
-import org.springframework.stereotype.Component;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.web.client.RestClient;
 
 public class ProductApiClient {
