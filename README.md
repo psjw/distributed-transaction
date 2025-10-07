@@ -143,3 +143,13 @@ update product set quantity=900 where id =1; --락 걸림 xa commit 'product_1';
   - 재고차감 예약이 아닌 즉시 차감
   - 최종적 일관성(Eventual Consistency)을 보장
 - Choreography 방식과 Orchestration 방식이 존재
+
+
+# Saga - Orchestration
+
+- Coodinator(또는 Orchestrator)가 각 참여 서비스들을 순차적으로 호출하며 전체 트랜잭션의 흐름을 제어
+- 장점
+  - 구현 난이도와 유지보수 난이도가 낮음
+- 단점
+  - 시간이 지날수록 Coordinator(Orchestrator)가 복잡해질 수 있음
+  - 서비스간 결합도가 증가함
