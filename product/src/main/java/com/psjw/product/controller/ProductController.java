@@ -4,6 +4,7 @@ import com.psjw.product.appliaction.ProductFacadeService;
 import com.psjw.product.appliaction.ProductService;
 import com.psjw.product.appliaction.RedisLockService;
 import com.psjw.product.appliaction.dto.ProductReserveResult;
+import com.psjw.product.controller.dto.ProductReserveConfirmRequest;
 import com.psjw.product.controller.dto.ProductReserveRequest;
 import com.psjw.product.controller.dto.ProductReserveResponse;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,6 +37,21 @@ public class ProductController {
         try{
             ProductReserveResult result = productFacadeService.tryReserve(request.toCommand());
             return new ProductReserveResponse(result.totalPrice());
+        }finally {
+            redisLockService.releaseLock(key);
+        }
+    }
+
+    @PostMapping("/product/confirm")
+    public void confirm(@RequestBody ProductReserveConfirmRequest request) {
+        String key = "product:" + request.requestId();
+        boolean acquiredLock = redisLockService.tryLock(key, request.requestId());
+        if(!acquiredLock){
+            throw new RuntimeException("락 획득에 실패하였습니다.");
+        }
+
+        try{
+            productFacadeService.confirmReserve(request.toCommand());
         }finally {
             redisLockService.releaseLock(key);
         }

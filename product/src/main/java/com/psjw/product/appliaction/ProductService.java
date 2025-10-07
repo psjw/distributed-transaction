@@ -1,9 +1,11 @@
 package com.psjw.product.appliaction;
 
 import com.psjw.product.appliaction.dto.ProductReserveCommand;
+import com.psjw.product.appliaction.dto.ProductReserveConfirmCommand;
 import com.psjw.product.appliaction.dto.ProductReserveResult;
 import com.psjw.product.domain.Product;
 import com.psjw.product.domain.ProductReservation;
+import com.psjw.product.domain.ProductReservation.ProductReservationStatus;
 import com.psjw.product.infrastucture.ProductRepository;
 import com.psjw.product.infrastucture.ProductReservationRepository;
 import java.util.List;
@@ -49,5 +51,32 @@ public class ProductService {
         }
 
         return new ProductReserveResult(totalPrice);
+    }
+
+    @Transactional
+    public void confirmReserve(ProductReserveConfirmCommand command) {
+        List<ProductReservation> reservations = productReservationRepository.findAllByRequestId(command.requestId());
+
+        if(reservations.isEmpty()) {
+            throw new RuntimeException("예약된 정보가 없습니다.");
+        }
+
+        boolean alreadyConfirmed = reservations.stream()
+                .anyMatch(item -> item.getStatus() == ProductReservationStatus.CONFIRMED);
+
+        if(alreadyConfirmed){
+            System.out.println("이미 확정이 되었습니다.");
+            return;
+        }
+
+        for (ProductReservation reservation : reservations) {
+            Product product = productRepository.findById(reservation.getProductId()).orElseThrow();
+
+            product.confirm(reservation.getReservedQuantity());
+            reservation.confirm();
+
+            productRepository.save(product);
+            productReservationRepository.save(reservation);
+        }
     }
 }
