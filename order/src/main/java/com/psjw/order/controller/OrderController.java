@@ -1,6 +1,7 @@
 package com.psjw.order.controller;
 
 
+import com.psjw.order.appliaction.OrderCoordinator;
 import com.psjw.order.appliaction.OrderService;
 import com.psjw.order.appliaction.RedisLockService;
 import com.psjw.order.appliaction.dto.CreateOrderResult;
@@ -15,11 +16,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
     private final OrderService orderService;
     private final RedisLockService redisLockService;
+    private final OrderCoordinator orderCoordinator;
 
 
-    public OrderController(OrderService orderService, RedisLockService redisLockService) {
+    public OrderController(OrderService orderService, RedisLockService redisLockService,
+            OrderCoordinator orderCoordinator) {
         this.orderService = orderService;
         this.redisLockService = redisLockService;
+        this.orderCoordinator = orderCoordinator;
     }
 
 
@@ -42,10 +46,10 @@ public class OrderController {
         }
 
         try{
+            orderCoordinator.placeOrder(request.toCommand());
         }finally {
             redisLockService.releaseLock(key);
         }
-
     }
 
 }
