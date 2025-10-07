@@ -124,3 +124,12 @@ update product set quantity=900 where id =1; --락 걸림 xa commit 'product_1';
   - 기존 시스템에 비해 설계와 구현이 복잡하다.
     - 모든 단계 (Try, Confirm, Cancel)는 멱등적으로 설계되어야 합니다.
     - 네트워크 오류, 재시도 시나리오를 고려한 복잡한 로직 구현이 필요합니다.
+
+
+# Pending 상태 대처
+
+- Confirm단계 실패
+  - 특정시간이 지난 경우 Admin에서 확인
+- Cancel단계 실패
+  - Order의 상태에 맞춰 자동으로 취소 처리
+
