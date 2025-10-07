@@ -133,3 +133,13 @@ update product set quantity=900 where id =1; --락 걸림 xa commit 'product_1';
 - Cancel단계 실패
   - Order의 상태에 맞춰 자동으로 취소 처리
 
+
+# Saga란?
+
+- 분산 시스템에서 데이터 정합성을 보장하기 위해 사용하는 분산트랜잭션 처리방식
+- 각 작업을 개별 트랜잭션으로 나누고 실패시 보상 트랜잭션을 수행하여 정합성을 맞추는 방식
+  - 보상트랜잭션 로직은 멱등성이어야하며 재시도 가능해야함
+- TCC와 달리 Saga는 리소스 예약 없이 즉시 상태 변경을 수행
+  - 재고차감 예약이 아닌 즉시 차감
+  - 최종적 일관성(Eventual Consistency)을 보장
+- Choreography 방식과 Orchestration 방식이 존재
