@@ -1,5 +1,6 @@
 package com.psjw.product.appliaction;
 
+import com.psjw.product.appliaction.dto.ProductReserveCancelCommand;
 import com.psjw.product.appliaction.dto.ProductReserveCommand;
 import com.psjw.product.appliaction.dto.ProductReserveConfirmCommand;
 import com.psjw.product.appliaction.dto.ProductReserveResult;
@@ -41,6 +42,23 @@ public class ProductFacadeService {
         while (tryCount < 3) {
             try{
                 productService.confirmReserve(command);
+                return;
+
+            }catch (ObjectOptimisticLockingFailureException e){
+                tryCount++;
+            }
+        }
+
+        throw new RuntimeException("예약에 실패하였습니다.");
+    }
+
+    @Transactional
+    public void  cancelReserve(ProductReserveCancelCommand command){
+        int tryCount = 0;
+
+        while (tryCount < 3) {
+            try{
+                productService.cancelReserve(command);
                 return;
 
             }catch (ObjectOptimisticLockingFailureException e){

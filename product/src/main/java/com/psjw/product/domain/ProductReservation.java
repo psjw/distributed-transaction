@@ -45,6 +45,15 @@ public class ProductReservation {
         CANCELED
     }
 
+
+    public void cancel(){
+        if(this.status == ProductReservationStatus.CANCELED){
+            throw new RuntimeException("이미 확정된 예약압니다.");
+        }
+
+        this.status = ProductReservationStatus.CANCELED;
+    }
+
     public void confirm(){
         if(this.status == ProductReservationStatus.CANCELED){
             throw new RuntimeException("이미 취소된 예약입니다.");

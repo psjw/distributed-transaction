@@ -1,9 +1,9 @@
 package com.psjw.product.controller;
 
 import com.psjw.product.appliaction.ProductFacadeService;
-import com.psjw.product.appliaction.ProductService;
 import com.psjw.product.appliaction.RedisLockService;
 import com.psjw.product.appliaction.dto.ProductReserveResult;
+import com.psjw.product.controller.dto.ProductReserveCancelRequest;
 import com.psjw.product.controller.dto.ProductReserveConfirmRequest;
 import com.psjw.product.controller.dto.ProductReserveRequest;
 import com.psjw.product.controller.dto.ProductReserveResponse;
@@ -30,14 +30,14 @@ public class ProductController {
         String key = "product:" + request.requestId();
         boolean acquiredLock = redisLockService.tryLock(key, request.requestId());
 
-        if(!acquiredLock){
+        if (!acquiredLock) {
             throw new RuntimeException("락 획득에 실패하였습니다.");
         }
 
-        try{
+        try {
             ProductReserveResult result = productFacadeService.tryReserve(request.toCommand());
             return new ProductReserveResponse(result.totalPrice());
-        }finally {
+        } finally {
             redisLockService.releaseLock(key);
         }
     }
@@ -46,13 +46,28 @@ public class ProductController {
     public void confirm(@RequestBody ProductReserveConfirmRequest request) {
         String key = "product:" + request.requestId();
         boolean acquiredLock = redisLockService.tryLock(key, request.requestId());
-        if(!acquiredLock){
+        if (!acquiredLock) {
             throw new RuntimeException("락 획득에 실패하였습니다.");
         }
 
-        try{
+        try {
             productFacadeService.confirmReserve(request.toCommand());
-        }finally {
+        } finally {
+            redisLockService.releaseLock(key);
+        }
+    }
+
+    @PostMapping("/product/cancel")
+    public void cancel(@RequestBody ProductReserveCancelRequest request) {
+        String key = "product:" + request.requestId();
+        boolean acquiredLock = redisLockService.tryLock(key, request.requestId());
+        if (!acquiredLock) {
+            throw new RuntimeException("락 획득에 실패하였습니다.");
+        }
+
+        try {
+            productFacadeService.cancelReserve(request.toCommand());
+        } finally {
             redisLockService.releaseLock(key);
         }
     }
