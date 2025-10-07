@@ -54,5 +54,19 @@ public class Point {
     public Long getId() {
         return id;
     }
+
+
+    public void confirm(Long reserveAmount){
+        if(this.amount < reserveAmount){
+            throw new RuntimeException("퐁딘트가 부족합니다.");
+        }
+
+        if(this.reservedAmount < reserveAmount){
+            throw new RuntimeException("예약된 금액이 부족합니다.");
+        }
+
+        this.amount -= reserveAmount;
+        this.reservedAmount -= reserveAmount;
+    }
 }
 
