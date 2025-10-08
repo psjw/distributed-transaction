@@ -162,3 +162,51 @@ update product set quantity=900 where id =1; --락 걸림 xa commit 'product_1';
   - 구현난이도 상승
   - 흐름 파익이 어려움
     - Coordinator가 없다보니 한눈에 파악하기 어려움
+
+# Kafka란?
+
+- 분산형 이벤트 스트리밍 플랫폼
+
+- docker-compose.yml
+
+```yaml
+version: "3.8"
+
+services:
+  kafka:
+    image: bitnamilegacy/kafka:3.7
+    container_name: order-kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - BITNAMI_DEBUG=true
+      - KAFKA_ENABLE_KRAFT=yes
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+```
+
+- 토픽생성
+```text
+docker exec -it order-kafka kafka-topics.sh --bootstrap-server localhost:9092 --create --topic testTopic
+```
+
+- 프로듀서 실행
+```text
+docker exec -it order-kafka kafka-console-producer.sh --topic testTopic --broker-list 0.0.0.0:9092
+```
+
+- 컨슈머 실행
+```text
+docker exec -it order-kafka kafka-console-consumer.sh --topic testTopic --bootstrap-server localhost:9092
+```
