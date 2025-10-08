@@ -210,3 +210,35 @@ docker exec -it order-kafka kafka-console-producer.sh --topic testTopic --broker
 ```text
 docker exec -it order-kafka kafka-console-consumer.sh --topic testTopic --bootstrap-server localhost:9092
 ```
+
+
+# 실무에서 가장 많이 사용하는것
+
+## 2PC
+- Two-Phase Commit Protocol의 약자로 분산 시스템에서 트랜잭션의 원자성을 보장하기 위해 사용하는 프로토콜
+- Prepare단계, Commit 단계 트랜잭션을 두단계로 나누어 처리함
+- 실용성이 낮기때문에 MSA 환경에서는 거의 사용되지 않습니다.
+
+## TCC
+
+- TCC(Try-Confirm-Cancel)는 분산 시스템에서 데이터 정합성을 보장하기 위해 사용하는 분산트랜잭션 처리방식
+- Try, Confirm, Cancel 세단계로 나누어 트랜잭션을 관리(리소스 예약 후 확정)
+- 강한 정합성이 필요한 영역에서 제한적으로 상요되며 일반적인 서비스에서는 사용빈도가 낮음
+
+## Saga
+
+- 분산시스템에서 데이터 정합성을 보장하기 위해 사용하는 분산 트랜잭션 처리방식
+- 각 작업을 개별 트랜잭션으로 나누고 실패시 보상트랜잭션을 수행하여 정합성을 맞추는 방식
+- TCC와 달리 Saga는 리소스 예약 없이 즉시 상태 변경을 수행
+  - 재고차감 예약이 아닌 즉시차감
+  - 최종적 일관성(Eventual Consistency)를 보장
+
+## Saga - Orchestration
+
+- Coodinator(또는 Ochestrator)가 각 참여 서비스들을 순차적으로 호출하며 전체 트랜잭션의 흐름을 제어하는 방식
+- 흐름파악이 용이하다는 장점이 존재하기 때문에 실무에서 많이 사용되는 방식
+
+## Saga - Choreography
+
+- Coodinator 없이 각 서비스가 이벤트를 발행, 구독하며 이를 통해 전체 트랜잭션의 흐름을 제어하는 방식
+- 흐름 파악이 어렵다는 단점이 존재하며 로직의 처리시간이 길어질 수 있는 상황일 때 많이 사용됨
