@@ -40,5 +40,9 @@ public class Point {
 
         this.amount = this.amount - amount;
     }
+
+    public void cancel(Long amount) {
+        this.amount = this.amount + amount;
+    }
 }
 

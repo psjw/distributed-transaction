@@ -40,4 +40,12 @@ public class PointTransactionHistory {
         USE, CANCEL
     }
 
+
+    public Long getPointId() {
+        return pointId;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
 }
