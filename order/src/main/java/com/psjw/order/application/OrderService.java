@@ -2,6 +2,7 @@ package com.psjw.order.application;
 
 import com.psjw.order.application.dto.CreateOrderCommand;
 import com.psjw.order.application.dto.CreateOrderResult;
+import com.psjw.order.application.dto.OrderDto;
 import com.psjw.order.domain.Order;
 import com.psjw.order.domain.OrderItem;
 import com.psjw.order.infrastructure.OrderItemRepository;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderService {
+
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
@@ -34,4 +36,41 @@ public class OrderService {
 
         return new CreateOrderResult(order.getId());
     }
+
+    public OrderDto getOrder(Long orderId) {
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderId(orderId);
+        return new OrderDto(
+                orderItems.stream()
+                        .map(item -> new OrderDto.OrderItem(
+                                item.getProductId(),
+                                item.getQuantity()
+                        )).toList()
+        );
+    }
+
+    @Transactional
+    public void request(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+
+        order.request();
+        orderRepository.save(order);
+    }
+
+    @Transactional
+    public void complete(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+
+        order.complete();
+        orderRepository.save(order);
+    }
+
+
+    @Transactional
+    public void fail(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+
+        order.fail();
+        orderRepository.save(order);
+    }
 }
+

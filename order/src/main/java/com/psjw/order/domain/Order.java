@@ -24,11 +24,25 @@ public class Order {
     }
 
     public void complete(){
-        status = OrderStatus.COMPLETE;
+        status = OrderStatus.COMPLETED;
     }
 
     public OrderStatus getStatus() {
         return status;
+    }
+
+    public void request(){
+        if(status != OrderStatus.CREATED){
+            throw new RuntimeException("잘못된 요청입니다.");
+        }
+        this.status = OrderStatus.REQUESTED;
+    }
+
+    public void fail(){
+        if(status != OrderStatus.REQUESTED){
+            throw new RuntimeException("잘못된 요청입니다.");
+        }
+        this.status = OrderStatus.FAILED;
     }
 
     public Long getId() {
@@ -36,6 +50,6 @@ public class Order {
     }
 
     public enum OrderStatus {
-        CREATED, COMPLETE
+        CREATED, REQUESTED, COMPLETED, FAILED
     }
 }
