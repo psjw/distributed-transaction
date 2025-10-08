@@ -1,7 +1,9 @@
 package com.psjw.product.appliaction;
 
+import com.psjw.product.appliaction.dto.ProductBuyCancelResult;
 import com.psjw.product.appliaction.dto.ProductBuyCommand;
 import com.psjw.product.appliaction.dto.ProductBuyResult;
+import com.psjw.product.appliaction.dto.ProductBuyCancelCommand;
 import com.psjw.product.domain.Product;
 import com.psjw.product.domain.ProductTransactionHistory;
 import com.psjw.product.domain.ProductTransactionHistory.TransactionType;
@@ -57,5 +59,48 @@ public class ProductService {
             ));
         }
         return new ProductBuyResult(totalPrice);
+    }
+
+
+    @Transactional
+    public ProductBuyCancelResult cancel(ProductBuyCancelCommand command) {
+        List<ProductTransactionHistory> buyHistories = productTransactionHistoryRepository.findAllByRequestIdAndTransactionType(
+                command.requestId(), TransactionType.PURCHASE);
+
+        if (buyHistories.isEmpty()) {
+            throw new RuntimeException("구매이력이 존재하지 않습니다.");
+        }
+
+        List<ProductTransactionHistory> cancelHistories = productTransactionHistoryRepository.findAllByRequestIdAndTransactionType(
+                command.requestId(), TransactionType.CANCEL);
+
+        if (!cancelHistories.isEmpty()) {
+            System.out.println("이미 취소되었습니다.");
+            Long totalPrice = cancelHistories.stream()
+                    .mapToLong(ProductTransactionHistory::getPrice)
+                    .sum();
+
+            return new ProductBuyCancelResult(totalPrice);
+        }
+
+        Long totalPrice = 0L;
+
+        for (ProductTransactionHistory history : buyHistories) {
+            Product product = productRepository.findById(history.getProductId()).orElseThrow();
+
+            product.cancel(history.getQuantity());
+            totalPrice += history.getPrice();
+
+            productTransactionHistoryRepository.save(new ProductTransactionHistory(
+                    command.requestId(),
+                    history.getProductId(),
+                    history.getQuantity(),
+                    history.getPrice(),
+                    TransactionType.CANCEL
+            ));
+
+        }
+
+        return new ProductBuyCancelResult(totalPrice);
     }
 }

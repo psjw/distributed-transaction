@@ -34,6 +34,14 @@ public class ProductTransactionHistory {
         return price;
     }
 
+    public Long getProductId() {
+        return productId;
+    }
+
+    public Long getQuantity() {
+        return quantity;
+    }
+
     public ProductTransactionHistory(String requestId, Long productId, Long quantity, Long price,
             TransactionType transactionType) {
         this.requestId = requestId;
