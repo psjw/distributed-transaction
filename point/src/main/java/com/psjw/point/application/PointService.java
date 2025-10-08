@@ -46,6 +46,8 @@ public class PointService {
                 command.amount(),
                 TransactionType.USE
         ));
+
+        throw new RuntimeException("강제로 예외 발생");
     }
 
     @Transactional

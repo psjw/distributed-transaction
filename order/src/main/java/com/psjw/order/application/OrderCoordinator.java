@@ -68,6 +68,9 @@ public class OrderCoordinator {
             }
 
             orderService.fail(command.orderId());
+
+            //강제 예외처리
+            throw e;
         }
     }
 }
