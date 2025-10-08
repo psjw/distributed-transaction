@@ -2,6 +2,8 @@ package com.psjw.order.application;
 
 import com.psjw.order.application.dto.OrderDto;
 import com.psjw.order.application.dto.PlaceOrderCommand;
+import com.psjw.order.domain.CompensationRegistry;
+import com.psjw.order.infrastructure.CompensationRegistryRepository;
 import com.psjw.order.infrastructure.point.PointApiClient;
 import com.psjw.order.infrastructure.point.PointUseApiRequest;
 import com.psjw.order.infrastructure.point.PointUseCancelApiRequest;
@@ -21,11 +23,15 @@ public class OrderCoordinator {
 
     private final PointApiClient pointApiClient;
 
+    private final CompensationRegistryRepository compensationRegistryRepository;
+
     public OrderCoordinator(OrderService orderService, ProductApiClient productApiClient,
-            PointApiClient pointApiClient) {
+            PointApiClient pointApiClient,
+            CompensationRegistryRepository compensationRegistryRepository) {
         this.orderService = orderService;
         this.productApiClient = productApiClient;
         this.pointApiClient = pointApiClient;
+        this.compensationRegistryRepository = compensationRegistryRepository;
     }
 
     public void placeOrder(PlaceOrderCommand command){
@@ -54,22 +60,31 @@ public class OrderCoordinator {
 
             orderService.complete(command.orderId());
         }catch (Exception e){
+            rollback(command.orderId());
+
+            //강제 예외처리
+            throw e;
+        }
+    }
+
+    public void rollback(Long orderId){
+        try{
             ProductBuyCancelApiRequest productBuyCancelApiRequest = new ProductBuyCancelApiRequest(
-                    command.orderId().toString());
+                    orderId.toString());
 
             ProductBuyCancelApiResponse productBuyCancelApiResponse = productApiClient.cancel(
                     productBuyCancelApiRequest);
 
             if(productBuyCancelApiResponse.totalPrice() > 0){
                 PointUseCancelApiRequest pointUseCancelApiRequest = new PointUseCancelApiRequest(
-                        command.orderId().toString());
+                        orderId.toString());
 
                 pointApiClient.cancel(pointUseCancelApiRequest);
             }
 
-            orderService.fail(command.orderId());
-
-            //강제 예외처리
+            orderService.fail(orderId);
+        } catch (Exception e) {
+            compensationRegistryRepository.save(new CompensationRegistry(orderId));
             throw e;
         }
     }
