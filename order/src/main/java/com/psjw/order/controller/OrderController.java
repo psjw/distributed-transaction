@@ -7,6 +7,9 @@ import com.psjw.order.application.dto.CreateOrderResult;
 import com.psjw.order.controller.dto.CreateOrderRequest;
 import com.psjw.order.controller.dto.CreateOrderResponse;
 import com.psjw.order.controller.dto.PlaceOrderRequest;
+import com.psjw.order.domain.Order.OrderStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -48,5 +51,10 @@ public class OrderController {
             redisLockService.releaseLock(lockKey);
         }
 
+    }
+
+    @GetMapping("/order/{id}/status")
+    public OrderStatus getOrderStatus(@PathVariable("id") Long id){
+        return orderService.getStatus(id);
     }
 }

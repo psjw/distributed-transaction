@@ -109,5 +109,11 @@ public class OrderService {
         order.fail();
         orderRepository.save(order);
     }
+
+    public Order.OrderStatus getStatus(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+
+        return order.getStatus();
+    }
 }
 
