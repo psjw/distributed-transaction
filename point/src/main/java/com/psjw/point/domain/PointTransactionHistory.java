@@ -9,7 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Table(name = "point_transaction_history")
+@Table(name = "point_transaction_histories")
 @Entity
 public class PointTransactionHistory {
     @Id

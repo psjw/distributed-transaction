@@ -7,6 +7,7 @@ import com.psjw.point.consumer.dto.QuantityDecreasedEvent;
 import com.psjw.point.infrastructure.kafka.PointUseFailProducer;
 import com.psjw.point.infrastructure.kafka.PointUsedProducer;
 import com.psjw.point.infrastructure.kafka.dto.PointUsedEvent;
+import com.psjw.point.infrastructure.kafka.dto.PointUsedFailEvent;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -28,7 +29,7 @@ public class QuantityDecreasedConsumer {
             topics = "quantity-decreased",
             groupId = "quantity-decreased-consumer",
             properties = {
-                    "spring.json.value.default.type=com.psjw.point.consumer.QuantityDecreasedEvent"
+                    "spring.json.value.default.type=com.psjw.point.consumer.dto.QuantityDecreasedEvent"
             }
 
     )
@@ -41,7 +42,7 @@ public class QuantityDecreasedConsumer {
         }catch (Exception e){
             pointService.cancel(new PointUseCancelCommand(requestId));
 
-            pointUsedProducer.send(new PointUsedEvent(event.orderId()));
+            pointUseFailProducer.send(new PointUsedFailEvent(event.orderId()));
         }
 
     }
